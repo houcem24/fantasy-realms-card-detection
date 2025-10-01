@@ -1,0 +1,12 @@
+names:
+- test
+nc: 1
+roboflow:
+  license: CC BY 4.0
+  project: fantasy-realms
+  url: https://universe.roboflow.com/houssem-ouerdiane-nmtbp/fantasy-realms/dataset/1
+  version: 1
+  workspace: houssem-ouerdiane-nmtbp
+test: ../test/images
+train: Fantasy-Realms-1/train/images
+val: Fantasy-Realms-1/valid/images

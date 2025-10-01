@@ -1,0 +1,64 @@
+names:
+- Air Elemental
+- Basilisk
+- Beast Master
+- Blizzard
+- Book Of Changes
+- Candle
+- Clock Tower
+- Collector
+- Doppelganger
+- Dragon
+- Dwarvish Infantry
+- Earth Elemental
+- Elemental Enchantress
+- Elven Archers
+- Elven Longbow
+- Empress
+- Fire Elemental
+- Forest
+- Forge
+- Fountain Of Life
+- Gem Of Order
+- Great Flood
+- Hydra
+- Island
+- King
+- Knights
+- Light Cavalry
+- Lightning
+- Magic Wand
+- Mirage
+- Mountain
+- Necromancer
+- Princess
+- Queen
+- Rainstorm
+- Rangers
+- Rune Of Protection
+- Shapeshifter
+- Shield Of Keth
+- Smoke
+- Swamp
+- Sword of Keth
+- Underground Caverns
+- Unicorn
+- War Dirigable
+- War Horse
+- Warlock Lord
+- Warlord
+- Warship
+- Water Elemental
+- Whirlwind
+- Wildfire
+- World Tree
+nc: 53
+roboflow:
+  license: CC BY 4.0
+  project: fantasy-realms
+  url: https://universe.roboflow.com/houssem-ouerdiane-nmtbp/fantasy-realms/dataset/5
+  version: 5
+  workspace: houssem-ouerdiane-nmtbp
+test: ../test/images
+train: Fantasy-Realms-5/train/images
+val: Fantasy-Realms-5/valid/images
