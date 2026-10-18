@@ -1,123 +1,83 @@
-Fantasy Realms Card Game — Computer Vision Project
+# Fantasy Realms Card Detection
 
-This project implements a computer vision system for the Fantasy Realms card game. The goal is to automatically recognize cards in hand / on the table, classify them, and assist game-scoring or digital interaction using vision algorithms.
+Computer vision for the card game *Fantasy Realms*: YOLOv8 models that recognise each of the game's cards in
+photos of a table, a discard pile or a player's hand, plus a rules engine that scores hands and recommends the
+best move.
 
-🎯 Project Overview
+<p align="center">
+  <img src="samples/single_card.jpg" width="30%" alt="Single card">
+  <img src="samples/hand.jpg" width="30%" alt="A seven-card hand">
+  <img src="samples/table.jpg" width="30%" alt="Cards spread on the table">
+</p>
 
-Use image processing / deep learning techniques to detect and recognize card faces and symbols in the Fantasy Realms card game.
+## Results
 
-Enable automated scoring, rule enforcement, or augmented reality overlays based on recognized cards.
+Four YOLOv8n models, each trained for 150 epochs at 640×640 on its own scenario. Metrics are Ultralytics
+validation scores at the final epoch.
 
-Support variations in lighting, card positions, occlusion, and camera angles.
+| Scenario | Precision | Recall | mAP@50 | mAP@50-95 |
+|---|---|---|---|---|
+| Table (cards spread face-up) | 0.95 | 0.84 | **0.96** | **0.95** |
+| Mixed (table + discard) | 0.81 | 0.78 | 0.87 | 0.82 |
+| Discard pile | 0.81 | 0.71 | 0.81 | 0.75 |
+| Hand (seven overlapping cards) | 0.42 | 0.61 | 0.57 | 0.53 |
 
-📂 Repository Structure
+Separated cards on a table are detected reliably. A held hand is much harder because the cards overlap and only
+their top edge is visible, which is the main open problem.
 
-Here’s a suggested (or observed) layout — adjust if your repo differs:
+## How it works
 
-.
-├── data/                    # images of cards (train / validation / test)
-├── models/                  # saved weights / checkpoints
-├── notebooks/               # experiments, visualization, testing
-├── src/
-│   ├── detection.py         # code for locating cards in an image
-│   ├── classification.py    # card classification (which card it is)
-│   ├── utils.py             # helper functions (preprocessing, augmentation)
-│   └── inference.py         # pipeline: detect + classify full image
-├── requirements.txt         # dependencies
-├── README.md                # this file
-├── LICENSE                  # license file
-└── demo/                    # sample input images & output visualizations
+1. **Data:** ~1,600 photos of real cards (German edition) under different lighting and angles, converted from
+   HEIC, sorted by card and suit, and labelled with bounding boxes in Roboflow. The labelled versions are
+   published on [Roboflow Universe](https://universe.roboflow.com/houssem-ouerdiane-nmtbp/fantasy-realms).
+2. **Training:** one YOLOv8n model per scenario (table, discard, hand, mixed), fine-tuned from COCO weights.
+3. **Evaluation:** precision/recall/mAP curves and confusion matrices per model, plus manual checks on a set of
+   fresh photos that were never used for training.
+4. **Scoring assistant:** `scoring_assistant.py` implements the full card rules (base strength, bonuses,
+   penalties, blanking) and, during a game, recommends which card to take from the table or deck and which one
+   to discard to maximise the hand's score.
 
-🛠️ Methods & Workflow
+## Repository structure
 
-Data collection & annotation
+```
+├── fantasy_realms_detection.ipynb   # Data preparation, training, evaluation and inference
+├── scoring_assistant.py             # Rules engine and move recommendations (command line)
+├── data*.yaml                       # YOLO dataset configs for each scenario
+├── samples/                         # Example photos
+├── requirements.txt
+└── .env.example                     # ROBOFLOW_API_KEY template
+```
 
-Capture or collect images of Fantasy Realms cards in varying conditions
+## Getting started
 
-Annotate bounding boxes and labels
-
-Preprocessing & augmentation
-
-Resize, normalize, augment (rotation, color jitter, etc.)
-
-Card detection / localization
-
-Use classical methods (contour detection, thresholding) or deep models (e.g. SSD, YOLO)
-
-Card classification
-
-For each detected region, apply a classifier (CNN or transfer learning) to predict which card
-
-Post-processing & scoring logic
-
-Combine recognized cards to compute game scores or validate hands
-
-Handle misclassifications or uncertainties
-
-Inference pipeline
-
-Given new image → detect cards → classify → output structured results (card IDs, positions)
-
-Optionally overlay bounding boxes and labels for visualization
-
-Evaluation & metrics
-
-Detection: IoU, precision/recall
-
-Classification: accuracy, confusion matrix
-
-Overall: correctness on full hands / game scoring
-
-⚙️ Setup & Installation
-
-Clone the repo:
-
-git clone https://github.com/houcem24/Fantasy-Realms-Card-Game-Computer-Vision-Project.git
-cd Fantasy-Realms-Card-Game-Computer-Vision-Project
-
-
-Create a virtual environment and install dependencies:
-
-python3 -m venv venv
-source venv/bin/activate
+```bash
+git clone https://github.com/houcem24/fantasy-realms-card-detection.git
+cd fantasy-realms-card-detection
+python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+cp .env.example .env               # add your Roboflow API key, then load it into your environment
+jupyter notebook fantasy_realms_detection.ipynb
+```
 
+The notebook downloads the dataset versions from Roboflow. Training each model takes several hours on a GPU;
+the training cells are commented out and the evaluation cells read the saved `runs/` results.
 
-Download / place annotated datasets into data/ folder.
+To try the scoring assistant on its own:
 
-Place any pretrained model files into models/ if required.
+```bash
+python scoring_assistant.py
+```
 
-🚀 Usage & Inference
+## Next steps
 
-To run detection + classification on a sample image:
+- Feed the detector's output directly into the scoring assistant instead of typing card names.
+- Improve hand detection with oriented bounding boxes or segmentation, since cards overlap.
 
-python src/inference.py --input demo/sample.jpg --output demo/out.json
+## Context
 
+Computer vision project at the University of Passau, winter semester 2024/25.
 
-You can use a notebook or script inside notebooks/ to explore results, visualize bounding boxes, or tune models.
+## License
 
-📈 Results & Performance
-
-Detection: (e.g. mean IoU, precision / recall)
-
-Classification accuracy on test set
-
-End-to-end scoring correctness: how often full hands / game outputs are correctly recognized
-
-Visual examples: overlayed bounding boxes and labels for sample images
-
-Include sample output images (before / after) in demo/ or embed in README.
-
-🔮 Future Improvements
-
-Use more advanced detection networks (e.g. transformers, attention-based models)
-
-Improve classification with ensemble learning or better augmentation
-
-Handle occlusions and overlapping cards more robustly
-
-Deploy a mobile app / real-time camera-based version
-
-Integrate error correction or human-in-the-loop validation
-
-Extend to multiplayer tables / full gameplay scenes
+Code: [MIT](LICENSE). Dataset: CC BY 4.0 (see Roboflow). *Fantasy Realms* is a trademark of WizKids; card
+artwork belongs to its respective owners.
